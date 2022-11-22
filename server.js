@@ -24,6 +24,9 @@ const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
 mongoose.connect(MONGO_CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 
+// To clear out doodles on startup if needed
+db.dropCollection('doodles')
+
 db.once('open', () => {
     console.log(`Connected to MongoDB at HOST: ${db.host} and PORT: ${db.port}`);
 });
@@ -33,6 +36,7 @@ db.on('error', (error) => {
 })
 
 app.use('/users', require('./controllers/user'));
+app.use('/doodles', require('./controllers/doodle'));
 
 const server = app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
 
