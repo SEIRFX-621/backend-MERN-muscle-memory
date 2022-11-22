@@ -41,3 +41,6 @@ This collection will be used for the doodle-history-app, feel free to name your 
 
 inside of this backend project is a postman collection with your signup and login routes already created with a postman environment file setup for these endpoints. Please see the postman login route to see how we are saving authentication tokens in your postman environment. (this is so you do not have to copy and paste your jwt from your login route to other postman request)
 
+## Debugging
+
+Please note there is launch.json file already created to locally debug this backend project inside of the .vscode directory. 
