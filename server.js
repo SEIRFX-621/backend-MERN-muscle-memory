@@ -7,7 +7,7 @@ require('./config/passport')(passport);
 
 // App Set up
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 5000;
 
 /** 
  * NOTE: We turn off urlencoding, because we will be submitting our form data from our react app as json.
