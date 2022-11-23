@@ -2,13 +2,9 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const { JWT_SECRET } = process.env;
 
 // DB Models
-const User = require('../models/user');
 const Doodle = require('../models/doodle');
 const DoodleVersion = require('../models/doodleVersion');
 
