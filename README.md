@@ -138,3 +138,188 @@ Our model should hold a reference to a user, and also it should hold a 2 dimensi
     0 0 0 1 0 0 0
     ```
 
+## Model suggestions
+
+I'd recommend breaking your doodles up into at least two models, one for holding user association and a collection of doodle versions. I'd also recommend making a doodle version collection that holds your doodle data and maybe even create a pixel schema to fill your doodle data schema with. 
+
+I solved my model issues on the backend with the following two models. 
+
+EX: Doodle collection
+```javascript
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
+const doodleSchema = new Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    doodleVersion: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DoodleVersion'
+    }]
+})
+
+const Doodle = mongoose.model('Doodle', doodleSchema);
+
+module.exports = Doodle;
+```
+
+notice how we make an association by reference for doodle version and user.
+
+EX: Doodle version
+```javascript
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const DoodleDataSchema = require('./doodleData');
+
+
+const doodleVersionSchema = new Schema({
+    version: {
+        type: Number,
+        required: true,
+        min: 0,
+        validate : {
+            validator : Number.isInteger,
+            message   : 'Version: {VALUE} is not an integer value'
+        }
+    },
+    doodleData: [DoodleDataSchema]
+})
+
+const DoodleVersion = mongoose.model('DoodleVersion', doodleVersionSchema);
+
+module.exports = DoodleVersion;
+```
+
+and our doodle data example model
+
+EX: doodle data
+```javascript
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
+const doodleDataSchema = new Schema({
+    x: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 19,
+        validate : {
+            validator : Number.isInteger,
+            message   : 'X: {VALUE} is not an integer value'
+        }
+    },
+    y: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 19,
+        validate : {
+            validator : Number.isInteger,
+            message   : 'Y: {VALUE} is not an integer value'
+        }
+    },
+})
+
+module.exports = doodleDataSchema;
+```
+
+notice how doodle data is just a schema and not a model, this is because we use an embedded reference in data version for holding a collection of doodle data. 
+
+You can see we have our suggested data model broke up into three main parts. 
+
+1. Doodle collection: This holds a reference to a doodle and all its versions and a user, this is how we search for doodles by users.
+
+2. Doodle versions, these are meant to store each individual state of our doodle after each pixel is edited, every new pixel will create a new version and add it to your doodle collection. 
+
+3. Doodle data schema, is a schema we use to hold a board state. This means it will hold all pixels that should be red, this might only be one pixel, or it could be 100 pixels, the thing to note is doodle data is a record of each pixel inside of a version.
+
+## Doodle controller
+
+In our doodle controller we'll want at least two endpoints, one for getting doodle data, and one for updating a doodle with a new doodle version. So you're looking at at least a GET and a POST route. Here is how we solved for this controller in the solution branch, but challenge yourself to figure out your own way. 
+
+```javascript
+// Imports
+require('dotenv').config();
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const { JWT_SECRET } = process.env;
+
+// DB Models
+const User = require('../models/user');
+const Doodle = require('../models/doodle');
+const DoodleVersion = require('../models/doodleVersion');
+
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        if (!req.user) throw new Error('No user in session');
+        const doodle = await Doodle.findOne({user: req.user._id}).populate('doodleVersion');
+        if (!doodle) {
+            res.json({
+                doodleHistory: null
+            })
+        } else {
+            res.json({
+                doodleHistory: doodle
+            })
+        }
+    } catch (error) {
+        console.log(`Error in fetching ${req.user.name}'s Doodle`);
+        res.status(400).json({
+            error: 'Failed to fetch user Doodle'
+        })
+    }
+})
+
+router.post('/update', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        if (!req.user) throw new Error('No user in session');
+        // find our existing doodle
+        let doodle = await Doodle.findOne({user: req.user._id}).populate('doodleVersion');
+        if (!doodle) {
+            // if doodle isn't found, we'll create a new doodle
+            const initialDoodleVersion = await DoodleVersion.create({
+                version: 0,
+                doodleData: []
+            })
+            doodle = await Doodle.create({
+                user: req.user,
+                doodleVersion: [initialDoodleVersion]
+            })
+        }
+
+        const { doodleCoords, version } = req.body;
+        if (!doodleCoords) throw new Error('No new doodle coordinates passed in request');
+        const newDoodleData = doodleCoords.map((coords) => {
+            return {
+                x: parseInt(coords.xCoord),
+                y: parseInt(coords.yCoord)
+            }
+        })
+        const newDoodleVersion = await DoodleVersion.create({
+            version: parseInt(version),
+            doodleData:  newDoodleData
+        });
+        doodle.doodleVersion.push(newDoodleVersion);
+        await doodle.save();
+        res.json({
+            doodleHistory: doodle
+        })
+    } catch (error) {
+        console.log(`Error in fetching ${req.user.name}'s Doodle`);
+        res.status(400).json({
+            error: 'Failed to fetch user Doodle'
+        })
+    }
+})
+
+
+// Exports
+module.exports = router;
+```
+
+I'd encourage anyone who is stuck to fire up the solution project and set break points throughout the backend and test our these endpoints using the postman collection included in this project.
