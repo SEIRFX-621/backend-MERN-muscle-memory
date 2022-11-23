@@ -17,8 +17,8 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
         if (!req.user) throw new Error('No user in session');
         const doodle = await Doodle.findOne({user: req.user._id}).populate('doodleVersion');
         if (!doodle) {
-            res.status(404).json({
-                doodleHistory: []
+            res.json({
+                doodleHistory: null
             })
         } else {
             res.json({
