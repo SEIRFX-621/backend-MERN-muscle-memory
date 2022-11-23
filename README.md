@@ -1,3 +1,11 @@
+# Doodle history app
+
+This is a simple web app that allows a user to log into the site with an email and password and then draw a piece 20x20 of pixel art. 
+
+This app will save each new pixel added to the drawing and will allow the user to rewind their drawing, as in, visit the state of the drawing for each pixel placed. This drawing will be stored in mongoDB via our backend application with an association to our user that we used to log in with. 
+
+The goals of the project are to challenge you to implement some more complex mongoDB models, as well as some more complex and algorithmically rigorous frontend data manipulation logic. We also hope to reinforce the fundamentals of MERN stack by building off the same template we used for project 3 and by providing you an excuse to get some additional MERN stack reps in. 
+
 # Setup
 
 This project is built off of your starter templates for MERN stack that you used for project 3.
@@ -44,3 +52,65 @@ inside of this backend project is a postman collection with your signup and logi
 ## Debugging
 
 Please note there is launch.json file already created to locally debug this backend project inside of the .vscode directory. 
+
+# Steps
+
+We will have to create the following controllers and models to support our doodle app's frontend. 
+
+1. We will need a model that will store doodles for each user
+2. we'll need to create our controller for doodles
+3. we'll need to create an endpoint for creating doodle version
+4. we'll need to create an endpoint for fetching our doodle history
+5. we'll need to create a component for deleting drawings
+
+## 1: Creating the models
+
+Our model should hold a reference to a user, and also it should hold a 2 dimension array that contains each cell of our doodle
+
+1. model should have user reference
+    This should involve creating a reference association with the user schema in your doodle model
+2. model should have doodle array data
+    Doodle data will be a collection of doodleData models. We will wantour doodle data to be a 20x20 grid with x and y coordinates for each pixel and an indication on if we need to fill that pixel with color ot now. 
+
+    You may noticed, we really only need to be storying pixels that will be drawn, as our client side app can assume all missing pixels will not be colored in. 
+
+    We will also need to be able to be able to fetch versions of each drawing(each new pixel colored in by our user will be a new doodle version).
+
+    So we will need our doodle model to hold an array of doodle versions, and each doodle version will need to hold the pixel coordinates that should be colored in. 
+
+    ex: 0 = no color, and 1 = color
+    see an example of how versions might be stored in our doodle data versions
+
+    ### Version 1
+    ```
+    0 0 0 1 0 0 0
+    0 0 1 0 1 0 0
+    0 1 0 0 0 1 0
+    1 0 0 0 0 0 1
+    0 1 0 0 0 1 0
+    0 0 1 0 1 0 0
+    0 0 0 1 0 0 0
+    ```
+
+    ### Version 2 (change inside of [])
+    ```
+    0 0 0[0]0 0 0
+    0 0 1 0 1 0 0
+    0 1 0 0 0 1 0
+    1 0 0 0 0 0 1
+    0 1 0 0 0 1 0
+    0 0 1 0 1 0 0
+    0 0 0 1 0 0 0
+    ```
+
+    ### Version 3 (change inside of [])
+    ```
+    0 0 0 0 0 0 0
+    0 0[0]0 1 0 0
+    0 1 0 0 0 1 0
+    1 0 0 0 0 0 1
+    0 1 0 0 0 1 0
+    0 0 1 0 1 0 0
+    0 0 0 1 0 0 0
+    ```
+

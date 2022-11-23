@@ -70,6 +70,62 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "GET: Fetch user doodle",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/doodles",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"doodles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST: Create new doodle version",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"version\": 1,\r\n    \"doodleCoords\": [\r\n        {\r\n            \"xCoord\": 1,\r\n            \"yCoord\": 1\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/doodles/update",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"doodles",
+						"update"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
