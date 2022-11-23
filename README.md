@@ -18,7 +18,7 @@ Feel free to style this page in a way that you feel is challenging you and your 
 
 ## Draw page(baseURL/doodles)
 
-The guts of our application will be inside of the doodle Page. You will clikc on each cell on the draw page to add a red pixel, this change will be passed to the backend and will be stored for your user in mongodb. You can also see on the top left corner of the page, there is a version dropdown(should be between 0-n), this will allow you to rewind your actions used to draw your pixel art. 
+The guts of our application will be inside of the doodle Page. You will click on each cell on the draw page to add a red pixel, this change will be passed to the backend and will be stored for your user in mongodb. You can also see on the top left corner of the page, there is a version dropdown(should be between 0-n), this will allow you to rewind your actions used to draw your pixel art. 
 
 ![Vanilla draw page](./readmeImages/MERN-doodle-view-version3.jpg)
 
