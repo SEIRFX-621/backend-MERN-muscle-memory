@@ -85,7 +85,6 @@ We will have to create the following controllers and models to support our doodl
 2. we'll need to create our controller for doodles
 3. we'll need to create an endpoint for creating doodle version
 4. we'll need to create an endpoint for fetching our doodle history
-5. we'll need to create a component for deleting drawings
 
 ## 1: Creating the models
 
